@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Auditing Framework</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="3" width="18" height="18" rx="2" stroke="#2563eb" stroke-width="2"/>
+                    <path d="M7 12L10 15L17 8" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <h1>Prompt Auditing Framework</h1>
+            </div>
+            <div class="header-actions">
+                <button class="btn-secondary" id="viewStandardsBtn">View Standards</button>
+                <button class="btn-secondary" id="aboutBtn">About</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3>Categories</h3>
+                    <div id="categoriesList" class="categories-list">
+                        <!-- Categories will be loaded here -->
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3>Quick Guide</h3>
+                    <p class="help-text">
+                        1. Paste your system prompt in the text area<br>
+                        2. Click "Generate Audit Report"<br>
+                        3. Review detailed compliance results<br>
+                        4. Check recommendations for improvement
+                    </p>
+                </div>
+            </aside>
+
+            <!-- Main Area -->
+            <main class="audit-container">
+                <div class="intro-section">
+                    <h2>System Prompt Auditor</h2>
+                    <p>Evaluate AI system prompts against user-centered ethical standards</p>
+                </div>
+
+                <!-- Input Area -->
+                <div class="prompt-input-section">
+                    <label for="promptInput" class="input-label">
+                        <span>System Prompt</span>
+                        <span class="input-hint">Paste your AI system prompt below</span>
+                    </label>
+                    <textarea 
+                        id="promptInput" 
+                        placeholder="Enter your system prompt here for auditing...&#10;&#10;Example: You are a helpful AI assistant that provides accurate information..."
+                        rows="8"
+                    ></textarea>
+                    <button class="audit-btn" id="auditBtn">
+                        <span>Generate Audit Report</span>
+                    </button>
+                </div>
+
+                <!-- Results Area -->
+                <div class="results-container" id="resultsContainer" style="display: none;">
+                    <div class="results-header">
+                        <h3>Audit Report</h3>
+                        <button class="btn-clear" id="clearBtn">Clear Results</button>
+                    </div>
+                    <div id="auditReport">
+                        <!-- Report will appear here -->
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Standards Modal -->
+    <div class="modal" id="standardsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Audit Standards</h2>
+                <button class="close-btn" id="closeStandardsBtn">&times;</button>
+            </div>
+            <div class="modal-body" id="standardsContent">
+                <!-- Standards will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div class="modal" id="aboutModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>About This Framework</h2>
+                <button class="close-btn" id="closeAboutBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>The <strong>Prompt Auditing Framework</strong> is a third-party auditing service designed to ensure AI system prompts serve users' best interests.</p>
+                
+                <h3>The Problem</h3>
+                <p>When users interact with AI services, system prompts are typically hidden. This lack of transparency can lead to conflicts of interest, such as agents being instructed to promote expensive products or biased recommendations.</p>
+                
+                <h3>The Solution</h3>
+                <p>This framework provides independent evaluation of system prompts against 35 ethical standards across 7 categories, balancing user protection with legitimate security concerns.</p>
+                
+                <h3>Evaluation Categories</h3>
+                <ul>
+                    <li><strong>Deception & Misinformation</strong> - Truthful representation of capabilities and sources</li>
+                    <li><strong>Manipulation</strong> - Free from coercive or exploitative tactics</li>
+                    <li><strong>Privacy Violation</strong> - Appropriate data collection and consent</li>
+                    <li><strong>High-Risk Harm</strong> - Prevention of financial, physical, psychological, and social harm</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
+
