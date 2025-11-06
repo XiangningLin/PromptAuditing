@@ -149,8 +149,13 @@ async function handleAudit() {
 }
 
 function displayAuditReport(result) {
-    const status = result.overall_status ? result.overall_status.toLowerCase() : 'warning';
-    const statusClass = status === 'pass' ? 'pass' : status === 'fail' ? 'fail' : 'warning';
+    const status = result.overall_status ? result.overall_status.toLowerCase() : 'fail';
+    const statusClass = status === 'pass' ? 'pass' : 'fail';
+    
+    const complianceRate = result.compliance_rate || 0;
+    const totalStandards = result.total_standards || 0;
+    const standardsPassed = result.standards_passed || 0;
+    const violationsFound = totalStandards - standardsPassed;
     
     // Create unique IDs for this report
     const radarChartId = 'radarChart-' + Date.now();
@@ -161,8 +166,14 @@ function displayAuditReport(result) {
                 <div class="audit-score">
                     <div class="score-circle-container">
                         <div class="score-circle ${statusClass}">
-                            ${result.overall_score || 0}
-                            <div class="score-label">Overall Score</div>
+                            ${complianceRate}<span style="font-size: 0.6em;">%</span>
+                            <div class="score-label">Compliance</div>
+                        </div>
+                        <div style="margin-top: 12px; text-align: center; font-size: 13px; color: var(--text-secondary);">
+                            ${standardsPassed}/${totalStandards} Standards Met<br>
+                            <strong style="color: ${violationsFound > 0 ? 'var(--danger-color)' : 'var(--success-color)'};">
+                                ${violationsFound} Violation${violationsFound !== 1 ? 's' : ''}
+                            </strong>
                         </div>
                     </div>
                     <div class="audit-summary">
@@ -180,11 +191,14 @@ function displayAuditReport(result) {
                     </div>
                 ` : ''}
                 
-                <h4 style="margin-bottom: 16px; font-size: 14px; font-weight: 600;">Detailed Category Evaluations</h4>
+                <h4 style="margin-bottom: 16px; font-size: 14px; font-weight: 600;">Category Compliance Results</h4>
                 ${result.categories ? result.categories.map(cat => {
-                    const catStatus = cat.status ? cat.status.toLowerCase() : 'warning';
-                    const catClass = catStatus === 'pass' ? 'pass' : catStatus === 'fail' ? 'fail' : 'warning';
-                    const catScore = cat.score || 0;
+                    const catStatus = cat.status ? cat.status.toLowerCase() : 'fail';
+                    const catClass = catStatus === 'pass' ? 'pass' : 'fail';
+                    const catPassed = cat.standards_passed || 0;
+                    const catTotal = cat.total_standards || 0;
+                    const catViolations = cat.violation_count || 0;
+                    const catRate = catTotal > 0 ? Math.round((catPassed / catTotal) * 100) : 0;
                     return `
                         <div class="category-result">
                             <h4>
@@ -192,15 +206,21 @@ function displayAuditReport(result) {
                                     <span class="status-badge ${catClass}">${cat.status || 'Unknown'}</span>
                                     <span>${cat.name}</span>
                                 </div>
-                                <span class="category-score ${catClass}">${catScore}/100</span>
+                                <span class="category-score ${catClass}">${catPassed}/${catTotal}</span>
                             </h4>
                             <div class="progress-bar-container">
-                                <div class="progress-bar ${catClass}" style="width: ${catScore}%"></div>
+                                <div class="progress-bar ${catClass}" style="width: ${catRate}%"></div>
                             </div>
                             <p>${cat.explanation || 'No explanation provided'}</p>
+                            ${catViolations > 0 ? `
+                                <div style="margin-top: 10px; padding: 8px 12px; background: var(--danger-light); border-radius: 6px; border-left: 3px solid var(--danger-color);">
+                                    <strong style="font-size: 12px; color: var(--danger-dark);">
+                                        ${catViolations} Violation${catViolations !== 1 ? 's' : ''} Found:
+                                    </strong>
+                                </div>
+                            ` : ''}
                         ${cat.violations && cat.violations.length > 0 ? `
                             <div class="violations">
-                                <strong style="font-size: 12px; color: #dc2626;">Violations Found:</strong>
                                 <ul>
                                     ${cat.violations.map(v => `<li>${v}</li>`).join('')}
                                 </ul>
@@ -244,7 +264,11 @@ function createRadarChart(canvasId, categories) {
     const ctx = canvas.getContext('2d');
     
     const labels = categories.map(cat => cat.name);
-    const scores = categories.map(cat => cat.score || 0);
+    const scores = categories.map(cat => {
+        const passed = cat.standards_passed || 0;
+        const total = cat.total_standards || 1;
+        return Math.round((passed / total) * 100);
+    });
     
     // Determine colors based on scores
     const backgroundColors = scores.map(score => {

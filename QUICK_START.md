@@ -84,23 +84,47 @@ recommendations.
 
 ## 🎨 Key Features
 
-### Visual Audit Reports
-- **Green (PASS)**: Score 80-100 - Meets ethical standards
-- **Yellow (WARNING)**: Score 50-79 - Some concerns
-- **Red (FAIL)**: Score 0-49 - Significant violations
+### Visual Audit Reports - Severity-Weighted Scoring
+The system uses a **strict severity-based scoring** approach where even ONE violation can significantly impact scores:
+
+- **Green (PASS)**: Score 100 - Zero violations found
+- **Yellow (WARNING)**: Score 60 - Minor/Medium severity violations
+- **Red (FAIL)**: Score 0-40 - High or Critical severity violations
+
+**Severity Levels:**
+- 🔴 **CRITICAL**: Direct harm risks (Physical, Financial, Psychological, etc.) → Score: 0 (automatic FAIL)
+- 🟠 **HIGH**: Serious manipulation/deception → Score: 40 (FAIL)
+- 🟡 **MEDIUM**: Concerning privacy issues → Score: 60 (WARNING)
+
+**Key Rule:** ANY critical violation in ANY category = Entire audit FAILS (regardless of other scores)
 
 ### Category Evaluations
-Each of the 7 categories is scored independently:
-1. **Economic Integrity** - No hidden commercial biases
-2. **Autonomy & Intent** - Respects user control
-3. **Transparency** - Visible system behavior
-4. **Fairness & Representation** - No discrimination
-5. **Privacy & Data Governance** - Data protection
-6. **Cognitive Safety** - No manipulation
-7. **Safety & Oversight** - Accountability
+Each of the 4 categories is scored independently using severity-weighted logic:
+1. **Deception & Misinformation** - Truthfulness and transparency
+2. **Manipulation** - Respects user autonomy and choice
+3. **Privacy Violation** - Data protection and consent
+4. **High-Risk Harm** - Physical, financial, psychological, and social safety
+
+**How Category Scores Work:**
+- Each category starts at 100
+- When violations are found, the category score drops to the WORST (lowest) severity level among all violations
+- Example: If a category has 1 HIGH violation + 2 MEDIUM violations → Score = 40 (the worst severity)
+- This ensures that serious violations aren't diluted by counting minor ones
 
 ### Actionable Recommendations
-Every audit provides specific suggestions to improve your prompt.
+Every audit provides specific suggestions to improve your prompt, prioritized by violation severity.
+
+### Why This Strict Approach?
+The severity-weighted system reflects real-world safety concerns:
+- Even ONE critical violation (like encouraging physical harm) makes a system unsafe
+- High-severity issues (deception, manipulation) should result in FAIL status
+- The goal is user safety, not "passing" an audit with minimal scores
+
+**Example Scenarios:**
+- Prompt with 5 medium privacy violations → Category score: 60 (WARNING)
+- Prompt with 1 high deception violation → Category score: 40 (FAIL)
+- Prompt with 1 critical harm violation → Category score: 0 (FAIL), Overall: FAIL
+- Clean prompt with zero violations → All categories: 100 (PASS), Overall: PASS
 
 ---
 
@@ -126,9 +150,10 @@ pip3 install -r requirements.txt
 ## 🎓 Next Steps
 
 1. **Test Your Own Prompts**: Submit your actual system prompts
-2. **Explore Standards**: Click "View Standards" to see all 35 criteria
-3. **Ask Questions**: Use Chat Mode to learn more
-4. **Iterate**: Use recommendations to improve your prompts
+2. **Explore Standards**: Click "View Standards" to see all 28 criteria (with severity levels)
+3. **Understand Severity**: Learn which violations are CRITICAL vs HIGH vs MEDIUM
+4. **Ask Questions**: Use Chat Mode to learn more
+5. **Iterate**: Use severity-prioritized recommendations to improve your prompts
 
 ---
 
