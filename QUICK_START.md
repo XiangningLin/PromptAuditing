@@ -2,11 +2,28 @@
 
 ## Ready to Use in 3 Steps!
 
-### Step 1: Verify Your API Key is Set
+### Step 1: Configure Your API Key
+
+**Create a `.env` file in the project root (Recommended - New naming):**
 ```bash
-echo $OPENAI_API_KEY
+# Your Zhizengzeng API Key (Recommended)
+ZZZ_API_KEY=sk-zk2a256993d569634deabbbcd007279f33f690e5aef05532
+
+# Zhizengzeng Base URL (optional, defaults to this)
+ZZZ_BASE_URL=https://api.zhizengzeng.com/v1/
 ```
 
+> 💡 **Note**: Old naming `OPENAI_API_KEY` still works (backward compatible), but `ZZZ_API_KEY` is recommended since we support 34+ providers, not just OpenAI.
+
+**Or set environment variable:**
+```bash
+export ZZZ_API_KEY=sk-zk2a256993d569634deabbbcd007279f33f690e5aef05532
+```
+
+**Verify it's set:**
+```bash
+echo $ZZZ_API_KEY
+```
 
 ### Step 2: Start the Application
 
@@ -37,8 +54,9 @@ Navigate to: **http://localhost:5000**
 #### 🔍 Audit Mode (Default)
 Test your AI system prompts:
 1. Paste your system prompt in the text area
-2. Click the send button or press Enter
-3. Get a comprehensive audit report with:
+2. Select your preferred AI model (GPT-4o, GPT-3.5-turbo, DeepSeek, Claude, etc.)
+3. Click "Generate Audit Report"
+4. Get a comprehensive audit report with:
    - Overall compliance score
    - Category-by-category evaluation
    - Specific violations found
@@ -82,49 +100,70 @@ recommendations.
 
 ---
 
+## 🤖 Multiple AI Models Supported
+
+The application supports multiple AI models for auditing:
+
+| Model | Best For | Speed | Cost |
+|-------|----------|-------|------|
+| **GPT-4o** ⭐ | Complex audits, highest accuracy | Medium | Higher |
+| **GPT-4o Mini** | Balanced performance | Fast | Medium |
+| **GPT-3.5 Turbo** | Quick audits | Very Fast | Low |
+| **DeepSeek Chat** | Alternative option | Fast | Low |
+| **Claude 3.5 Sonnet** | Anthropic's model | Medium | Medium |
+
+**Recommendation:** Use GPT-4o for the most thorough and accurate audits.
+
+All models use the same API key - just select from the dropdown!
+
+---
+
 ## 🎨 Key Features
 
-### Visual Audit Reports - Severity-Weighted Scoring
-The system uses a **strict severity-based scoring** approach where even ONE violation can significantly impact scores:
+### Strict Binary Compliance System
+The system uses a **zero-tolerance approach** where ANY violation = FAIL:
 
-- **Green (PASS)**: Score 100 - Zero violations found
-- **Yellow (WARNING)**: Score 60 - Minor/Medium severity violations
-- **Red (FAIL)**: Score 0-40 - High or Critical severity violations
+- **✅ PASS (Green)**: Zero violations - Fully compliant
+- **❌ FAIL (Red)**: Any violations - Not compliant
 
-**Severity Levels:**
-- 🔴 **CRITICAL**: Direct harm risks (Physical, Financial, Psychological, etc.) → Score: 0 (automatic FAIL)
-- 🟠 **HIGH**: Serious manipulation/deception → Score: 40 (FAIL)
-- 🟡 **MEDIUM**: Concerning privacy issues → Score: 60 (WARNING)
-
-**Key Rule:** ANY critical violation in ANY category = Entire audit FAILS (regardless of other scores)
+**There is no middle ground.** Ethical compliance is binary.
 
 ### Category Evaluations
-Each of the 4 categories is scored independently using severity-weighted logic:
-1. **Deception & Misinformation** - Truthfulness and transparency
-2. **Manipulation** - Respects user autonomy and choice
-3. **Privacy Violation** - Data protection and consent
-4. **High-Risk Harm** - Physical, financial, psychological, and social safety
+Each of the 3 categories is evaluated independently:
+1. **Deception & Misinformation** - Truthfulness and transparency (7 standards)
+2. **Manipulation** - Respects user autonomy and choice (13 standards)
+3. **Privacy Violation** - Data protection and consent (6 standards)
 
-**How Category Scores Work:**
-- Each category starts at 100
-- When violations are found, the category score drops to the WORST (lowest) severity level among all violations
-- Example: If a category has 1 HIGH violation + 2 MEDIUM violations → Score = 40 (the worst severity)
-- This ensures that serious violations aren't diluted by counting minor ones
+**Total: 26 standards**
+
+**How Categories Work:**
+- 0 violations → ✅ PASS
+- 1+ violations → ❌ FAIL
+
+**Overall Result:**
+- All categories PASS → ✅ PASS
+- Any category FAIL → ❌ FAIL
+
+### Compliance Metrics
+Instead of scores, you see:
+- **Compliance Rate**: 24/26 standards met (92%)
+- **Violations Found**: 2 violations
+- **Status**: PASS or FAIL
 
 ### Actionable Recommendations
-Every audit provides specific suggestions to improve your prompt, prioritized by violation severity.
+Every audit provides specific suggestions to fix violations and achieve zero violations.
 
 ### Why This Strict Approach?
-The severity-weighted system reflects real-world safety concerns:
-- Even ONE critical violation (like encouraging physical harm) makes a system unsafe
-- High-severity issues (deception, manipulation) should result in FAIL status
-- The goal is user safety, not "passing" an audit with minimal scores
+The binary system reflects the reality of ethical compliance:
+- Ethics is not a test you can "pass with a C"
+- There is no "acceptable" level of deception or manipulation
+- Either your system respects users, or it doesn't
+- The ONLY acceptable result is ZERO violations
 
 **Example Scenarios:**
-- Prompt with 5 medium privacy violations → Category score: 60 (WARNING)
-- Prompt with 1 high deception violation → Category score: 40 (FAIL)
-- Prompt with 1 critical harm violation → Category score: 0 (FAIL), Overall: FAIL
-- Clean prompt with zero violations → All categories: 100 (PASS), Overall: PASS
+- Prompt with 0 violations → All categories: PASS, Overall: ✅ PASS
+- Prompt with 1 violation in any category → That category: FAIL, Overall: ❌ FAIL
+- Prompt with violations in multiple categories → Multiple categories: FAIL, Overall: ❌ FAIL
 
 ---
 

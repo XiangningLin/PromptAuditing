@@ -10,8 +10,16 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# Initialize OpenAI client
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+# Initialize AI client with zhizengzeng base URL
+# 注意：使用 OpenAI 兼容的客户端，但支持多个 AI 提供商
+# API Key 可以使用 ZZZ_API_KEY 或 OPENAI_API_KEY（向后兼容）
+api_key = os.environ.get("ZZZ_API_KEY") or os.environ.get("OPENAI_API_KEY")
+base_url = os.environ.get("ZZZ_BASE_URL") or os.environ.get("OPENAI_BASE_URL", "https://api.zhizengzeng.com/v1/")
+
+client = OpenAI(
+    api_key=api_key,
+    base_url=base_url
+)
 
 # Load standards
 with open('standards.json', 'r') as f:
@@ -79,7 +87,7 @@ Please provide:
    - Compliance rate percentage
    - Overall status (PASS/WARNING/FAIL)
    
-3. **Critical Issues**: List violations from High-Risk Harm category first, then others by severity
+3. **Critical Issues**: List all violations prioritized by severity (CRITICAL first, then HIGH, then MEDIUM)
 
 4. **Recommendations**: 3-5 specific, actionable recommendations to achieve zero violations
 
@@ -119,12 +127,53 @@ def get_standards():
     """Return the standards data"""
     return jsonify(standards_data)
 
+@app.route('/api/models')
+def get_models():
+    """Return available models - organized by provider"""
+    models = {
+        "recommended": [
+            {"id": "gpt-4o", "name": "GPT-4o", "provider": "OpenAI", "description": "Most capable, best for complex audits"},
+            {"id": "claude-3-5-sonnet-20241022", "name": "Claude 3.5 Sonnet", "provider": "Anthropic", "description": "Excellent reasoning"},
+            {"id": "gemini-1.5-pro", "name": "Gemini 1.5 Pro", "provider": "Google", "description": "Google's advanced model"},
+        ],
+        "openai": [
+            # Note: gpt-4o is in recommended, removed from here to avoid duplication
+            {"id": "gpt-4o-mini", "name": "GPT-4o Mini", "provider": "OpenAI", "description": "Faster and cost-effective"},
+            {"id": "gpt-4-turbo", "name": "GPT-4 Turbo", "provider": "OpenAI", "description": "Previous generation"},
+            {"id": "gpt-3.5-turbo", "name": "GPT-3.5 Turbo", "provider": "OpenAI", "description": "Fast and efficient"},
+        ],
+        "anthropic": [
+            # Note: claude-3-5-sonnet-20241022 is in recommended, removed from here
+            {"id": "claude-3-opus-20240229", "name": "Claude 3 Opus", "provider": "Anthropic", "description": "Most capable Claude"},
+            {"id": "claude-3-haiku-20240307", "name": "Claude 3 Haiku", "provider": "Anthropic", "description": "Fastest Claude"},
+        ],
+        "chinese": [
+            {"id": "qwen-max", "name": "通义千问 Max", "provider": "Alibaba", "description": "阿里最强模型"},
+            {"id": "qwen-plus", "name": "通义千问 Plus", "provider": "Alibaba", "description": "平衡性能"},
+            {"id": "qwen-turbo", "name": "通义千问 Turbo", "provider": "Alibaba", "description": "快速响应"},
+            {"id": "ernie-bot-4", "name": "文心一言 4.0", "provider": "Baidu", "description": "百度最新模型"},
+            {"id": "glm-4", "name": "ChatGLM-4", "provider": "Zhipu", "description": "智谱最新模型"},
+            {"id": "deepseek-chat", "name": "DeepSeek Chat", "provider": "DeepSeek", "description": "深度求索"},
+            {"id": "doubao-pro-32k", "name": "豆包 Pro", "provider": "ByteDance", "description": "字节跳动"},
+        ],
+        "google": [
+            # Note: gemini-1.5-pro is in recommended, removed from here
+            {"id": "gemini-1.5-flash", "name": "Gemini 1.5 Flash", "provider": "Google", "description": "Fast Gemini"},
+        ],
+        "other": [
+            {"id": "deepseek-coder", "name": "DeepSeek Coder", "provider": "DeepSeek", "description": "Specialized for coding"},
+            {"id": "llama-3-70b", "name": "Llama 3 70B", "provider": "Meta", "description": "Open source model"},
+        ]
+    }
+    return jsonify({"models": models})
+
 @app.route('/api/audit', methods=['POST'])
 def audit_prompt():
     """Audit a system prompt"""
     try:
         data = request.json
         system_prompt = data.get('prompt', '')
+        selected_model = data.get('model', 'gpt-4o')  # 默认使用 gpt-4o
         
         if not system_prompt.strip():
             return jsonify({'error': 'Please provide a system prompt to audit'}), 400
@@ -132,9 +181,9 @@ def audit_prompt():
         # Create audit prompt
         audit_prompt_text = create_audit_prompt(system_prompt)
         
-        # Call OpenAI API
+        # Call OpenAI API with selected model
         response = client.chat.completions.create(
-            model="gpt-4o",
+            model=selected_model,
             messages=[
                 {"role": "system", "content": "You are an expert AI ethics auditor. Always respond with valid JSON."},
                 {"role": "user", "content": audit_prompt_text}
@@ -143,8 +192,18 @@ def audit_prompt():
             response_format={"type": "json_object"}
         )
         
+        # Validate response
+        if not response or not response.choices or len(response.choices) == 0:
+            return jsonify({'error': 'No response from AI model'}), 500
+        
+        if not response.choices[0].message or not response.choices[0].message.content:
+            return jsonify({'error': 'Empty response from AI model'}), 500
+        
         # Parse response
-        result = json.loads(response.choices[0].message.content)
+        try:
+            result = json.loads(response.choices[0].message.content)
+        except json.JSONDecodeError as e:
+            return jsonify({'error': f'Invalid JSON response from AI model: {str(e)}'}), 500
         
         # Validate and recalculate compliance metrics (no scores, just violation counts)
         if result.get('categories'):
@@ -196,8 +255,16 @@ def audit_prompt():
         return jsonify(result)
         
     except Exception as e:
-        print(f"Error: {str(e)}")
-        return jsonify({'error': f'Audit failed: {str(e)}'}), 500
+        import traceback
+        error_trace = traceback.format_exc()
+        print(f"Error in audit_prompt: {str(e)}")
+        print(f"Traceback: {error_trace}")
+        
+        # Return more detailed error message
+        return jsonify({
+            'error': f'Audit failed: {str(e)}',
+            'details': 'Please check server logs for more information'
+        }), 500
 
 
 if __name__ == '__main__':

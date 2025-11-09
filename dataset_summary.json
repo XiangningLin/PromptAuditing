@@ -1,0 +1,54 @@
+{
+  "seed_prompts": {
+    "total": 140,
+    "good": 70,
+    "bad": 70,
+    "categories": 3,
+    "subcategories": 7,
+    "avg_length": 146,
+    "by_category": {
+      "Deception & Misinformation": {
+        "total": 60,
+        "good": 30,
+        "bad": 30
+      },
+      "Manipulation": {
+        "total": 40,
+        "good": 20,
+        "bad": 20
+      },
+      "Privacy Violation": {
+        "total": 40,
+        "good": 20,
+        "bad": 20
+      }
+    }
+  },
+  "generated_prompts": {
+    "total": 130,
+    "avg_length": 314,
+    "by_type": {
+      "combined_bad": {
+        "count": 50,
+        "percentage": 38.5
+      },
+      "mixed": {
+        "count": 30,
+        "percentage": 23.1
+      },
+      "subtle_violation": {
+        "count": 20,
+        "percentage": 15.4
+      },
+      "category_specific": {
+        "count": 30,
+        "percentage": 23.1
+      }
+    }
+  },
+  "total_dataset": {
+    "total_prompts": 270,
+    "seed_prompts": 140,
+    "generated_prompts": 130
+  }
+}

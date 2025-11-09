@@ -1,5 +1,6 @@
 // State
 let standards = null;
+let models = [];
 
 // DOM Elements
 const promptInput = document.getElementById('promptInput');
@@ -14,10 +15,16 @@ const aboutModal = document.getElementById('aboutModal');
 const closeStandardsBtn = document.getElementById('closeStandardsBtn');
 const closeAboutBtn = document.getElementById('closeAboutBtn');
 const categoriesList = document.getElementById('categoriesList');
+const modelSelect = document.getElementById('modelSelect');
+const customSelect = document.getElementById('customSelect');
+const customSelectTrigger = customSelect?.querySelector('.custom-select-trigger');
+const customSelectValue = customSelect?.querySelector('.custom-select-value');
+const customSelectOptions = customSelect?.querySelector('.custom-select-options');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     loadStandards();
+    loadModels();
     setupEventListeners();
 });
 
@@ -45,6 +52,131 @@ function setupEventListeners() {
             aboutModal.classList.remove('active');
         }
     });
+    
+    // Custom select dropdown
+    setupCustomSelect();
+}
+
+function setupCustomSelect() {
+    if (!customSelectTrigger) return;
+    
+    // Toggle dropdown
+    customSelectTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = customSelect.classList.toggle('open');
+        customSelectTrigger.setAttribute('aria-expanded', isOpen);
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!customSelect.contains(e.target)) {
+            customSelect.classList.remove('open');
+            customSelectTrigger.setAttribute('aria-expanded', 'false');
+        }
+    });
+    
+    // Keyboard navigation
+    customSelectTrigger.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            const isOpen = customSelect.classList.toggle('open');
+            customSelectTrigger.setAttribute('aria-expanded', isOpen);
+        } else if (e.key === 'Escape') {
+            customSelect.classList.remove('open');
+            customSelectTrigger.setAttribute('aria-expanded', 'false');
+        }
+    });
+}
+
+function populateCustomSelect(modelsData) {
+    if (!customSelectOptions) return;
+    
+    customSelectOptions.innerHTML = '';
+    
+    // Define group structure with display names
+    const groups = [
+        { key: 'recommended', label: '⭐ Recommended' },
+        { key: 'openai', label: '🤖 OpenAI' },
+        { key: 'anthropic', label: '🧠 Anthropic' },
+        { key: 'chinese', label: '🇨🇳 Chinese Models' },
+        { key: 'google', label: '🔍 Google' },
+        { key: 'other', label: '🔧 Other' }
+    ];
+    
+    // Track added model IDs to avoid duplicates
+    const addedModels = new Set();
+    
+    groups.forEach(group => {
+        const modelsList = modelsData[group.key];
+        if (!modelsList || modelsList.length === 0) return;
+        
+        // Filter out duplicates
+        const uniqueModels = modelsList.filter(model => {
+            if (addedModels.has(model.id)) {
+                return false;
+            }
+            addedModels.add(model.id);
+            return true;
+        });
+        
+        if (uniqueModels.length === 0) return;
+        
+        // Add group label
+        const groupLabel = document.createElement('div');
+        groupLabel.className = 'custom-select-group-label';
+        groupLabel.textContent = group.label;
+        customSelectOptions.appendChild(groupLabel);
+        
+        // Add options
+        uniqueModels.forEach(model => {
+            const option = document.createElement('div');
+            option.className = 'custom-select-option';
+            option.dataset.value = model.id;
+            
+            const label = document.createElement('span');
+            label.className = 'custom-select-option-label';
+            label.textContent = model.name;
+            
+            option.appendChild(label);
+            
+            // Mark first option as selected
+            if (model.id === 'gpt-4o') {
+                option.classList.add('selected');
+            }
+            
+            option.addEventListener('click', () => selectOption(model, option));
+            customSelectOptions.appendChild(option);
+        });
+    });
+}
+
+function selectOption(model, optionElement) {
+    // Update hidden select
+    modelSelect.value = model.id;
+    
+    // Update display value
+    customSelectValue.textContent = model.name;
+    
+    // Update selected state
+    document.querySelectorAll('.custom-select-option').forEach(opt => {
+        opt.classList.remove('selected');
+    });
+    optionElement.classList.add('selected');
+    
+    // Close dropdown
+    customSelect.classList.remove('open');
+    customSelectTrigger.setAttribute('aria-expanded', 'false');
+    
+    // Show model info if available
+    if (model.description) {
+        const modelInfo = document.getElementById('modelInfo');
+        const provider = modelInfo.querySelector('.model-info-provider');
+        const description = modelInfo.querySelector('.model-info-description');
+        
+        provider.textContent = model.provider || '';
+        description.textContent = model.description || '';
+        modelInfo.style.display = 'block';
+    }
 }
 
 function handleClear() {
@@ -61,6 +193,159 @@ async function loadStandards() {
         renderCategories();
     } catch (error) {
         console.error('Failed to load standards:', error);
+    }
+}
+
+async function loadModels() {
+    try {
+        const response = await fetch('/api/models');
+        const data = await response.json();
+        models = data.models || [];
+        renderModels();
+    } catch (error) {
+        console.error('Failed to load models:', error);
+    }
+}
+
+function renderModels() {
+    if (!models || Object.keys(models).length === 0) return;
+    
+    modelSelect.innerHTML = '';
+    
+    // Store model data for info display
+    window.modelData = {};
+    
+    // 如果是分组的模型列表
+    if (models.recommended) {
+        // 推荐模型
+        const recommendedGroup = document.createElement('optgroup');
+        recommendedGroup.label = '⭐ Recommended';
+        models.recommended.forEach(model => {
+            const option = document.createElement('option');
+            option.value = model.id;
+            option.textContent = `${model.name} - ${model.description}`;
+            option.setAttribute('data-provider', model.provider);
+            option.setAttribute('data-description', model.description);
+            recommendedGroup.appendChild(option);
+            window.modelData[model.id] = model;
+        });
+        modelSelect.appendChild(recommendedGroup);
+        
+        // OpenAI 模型
+        if (models.openai) {
+            const openaiGroup = document.createElement('optgroup');
+            openaiGroup.label = '🤖 OpenAI';
+            models.openai.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model.id;
+                option.textContent = `${model.name} - ${model.description}`;
+                option.setAttribute('data-provider', model.provider);
+                option.setAttribute('data-description', model.description);
+                openaiGroup.appendChild(option);
+                window.modelData[model.id] = model;
+            });
+            modelSelect.appendChild(openaiGroup);
+        }
+        
+        // Anthropic 模型
+        if (models.anthropic) {
+            const anthropicGroup = document.createElement('optgroup');
+            anthropicGroup.label = '🧠 Anthropic';
+            models.anthropic.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model.id;
+                option.textContent = `${model.name} - ${model.description}`;
+                option.setAttribute('data-provider', model.provider);
+                option.setAttribute('data-description', model.description);
+                anthropicGroup.appendChild(option);
+                window.modelData[model.id] = model;
+            });
+            modelSelect.appendChild(anthropicGroup);
+        }
+        
+        // 中国模型
+        if (models.chinese) {
+            const chineseGroup = document.createElement('optgroup');
+            chineseGroup.label = '🇨🇳 Chinese Models';
+            models.chinese.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model.id;
+                option.textContent = `${model.name} - ${model.description}`;
+                option.setAttribute('data-provider', model.provider);
+                option.setAttribute('data-description', model.description);
+                chineseGroup.appendChild(option);
+                window.modelData[model.id] = model;
+            });
+            modelSelect.appendChild(chineseGroup);
+        }
+        
+        // Google 模型
+        if (models.google) {
+            const googleGroup = document.createElement('optgroup');
+            googleGroup.label = '🔍 Google';
+            models.google.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model.id;
+                option.textContent = `${model.name} - ${model.description}`;
+                option.setAttribute('data-provider', model.provider);
+                option.setAttribute('data-description', model.description);
+                googleGroup.appendChild(option);
+                window.modelData[model.id] = model;
+            });
+            modelSelect.appendChild(googleGroup);
+        }
+        
+        // 其他模型
+        if (models.other) {
+            const otherGroup = document.createElement('optgroup');
+            otherGroup.label = '🔧 Other';
+            models.other.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model.id;
+                option.textContent = `${model.name} - ${model.description}`;
+                option.setAttribute('data-provider', model.provider);
+                option.setAttribute('data-description', model.description);
+                otherGroup.appendChild(option);
+                window.modelData[model.id] = model;
+            });
+            modelSelect.appendChild(otherGroup);
+        }
+        
+        // Add change event listener to show model info
+        modelSelect.addEventListener('change', updateModelInfo);
+        updateModelInfo(); // Show info for initially selected model
+        
+        // Populate custom select with grouped models (deduplication handled inside)
+        populateCustomSelect(models);
+        
+    } else if (Array.isArray(models)) {
+        // 如果是数组格式（向后兼容）
+        models.forEach(model => {
+            const option = document.createElement('option');
+            option.value = model.id;
+            option.textContent = `${model.name} - ${model.description}`;
+            modelSelect.appendChild(option);
+        });
+        // For array format, wrap in an 'other' group
+        populateCustomSelect({ other: models });
+    }
+}
+
+function updateModelInfo() {
+    const selectedModelId = modelSelect.value;
+    const modelInfo = window.modelData[selectedModelId];
+    const modelInfoCard = document.getElementById('modelInfo');
+    
+    if (modelInfo) {
+        const providerSpan = modelInfoCard.querySelector('.model-info-provider');
+        const descriptionSpan = modelInfoCard.querySelector('.model-info-description');
+        
+        providerSpan.textContent = modelInfo.provider;
+        descriptionSpan.textContent = modelInfo.description;
+        
+        modelInfoCard.style.display = 'block';
+    } else {
+        modelInfoCard.style.display = 'none';
     }
 }
 
@@ -111,6 +396,8 @@ async function handleAudit() {
         return;
     }
     
+    const selectedModel = modelSelect.value;
+    
     // Disable button and show loading
     auditBtn.disabled = true;
     auditBtn.innerHTML = `
@@ -123,7 +410,10 @@ async function handleAudit() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ prompt }),
+            body: JSON.stringify({ 
+                prompt: prompt,
+                model: selectedModel 
+            }),
         });
         
         if (!response.ok) {
@@ -157,9 +447,6 @@ function displayAuditReport(result) {
     const standardsPassed = result.standards_passed || 0;
     const violationsFound = totalStandards - standardsPassed;
     
-    // Create unique IDs for this report
-    const radarChartId = 'radarChart-' + Date.now();
-    
     auditReport.innerHTML = `
         <div class="report-card">
             <div class="audit-header">
@@ -184,13 +471,6 @@ function displayAuditReport(result) {
                 </div>
             </div>
             <div class="audit-body">
-                ${result.categories ? `
-                    <div class="radar-chart-container">
-                        <h4 style="margin-bottom: 16px; text-align: center; color: var(--text-primary); font-size: 14px; font-weight: 600;">Category Performance Overview</h4>
-                        <canvas id="${radarChartId}" class="radar-chart-canvas"></canvas>
-                    </div>
-                ` : ''}
-                
                 <h4 style="margin-bottom: 16px; font-size: 14px; font-weight: 600;">Category Compliance Results</h4>
                 ${result.categories ? result.categories.map(cat => {
                     const catStatus = cat.status ? cat.status.toLowerCase() : 'fail';

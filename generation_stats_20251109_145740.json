@@ -1,0 +1,10 @@
+{
+  "total": 130,
+  "by_type": {
+    "combined_bad": 50,
+    "mixed": 30,
+    "subtle_violation": 20,
+    "category_specific": 30
+  },
+  "by_expected_label": {}
+}

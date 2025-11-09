@@ -65,6 +65,50 @@
                         placeholder="Enter your system prompt here for auditing...&#10;&#10;Example: You are a helpful AI assistant that provides accurate information..."
                         rows="8"
                     ></textarea>
+                    
+                    <div class="model-selector-wrapper">
+                        <div class="model-selector-header">
+                            <div class="model-label-group">
+                                <svg class="model-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <div>
+                                    <label for="modelSelect" class="model-label-text">AI Model</label>
+                                    <span class="model-hint-text">Select the model to perform the audit</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="model-select-wrapper">
+                            <!-- Hidden native select for form compatibility -->
+                            <select id="modelSelect" style="display: none;">
+                                <option value="gpt-4o">GPT-4o (Recommended)</option>
+                            </select>
+                            
+                            <!-- Custom dropdown -->
+                            <div class="custom-select" id="customSelect">
+                                <div class="custom-select-trigger" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                                    <span class="custom-select-value">GPT-4o (Recommended)</span>
+                                    <svg class="select-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="custom-select-dropdown" role="listbox">
+                                    <div class="custom-select-options">
+                                        <!-- Options will be populated by JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="modelInfo" class="model-info-card" style="display: none;">
+                            <div class="model-info-content">
+                                <span class="model-info-provider"></span>
+                                <span class="model-info-description"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <button class="audit-btn" id="auditBtn">
                         <span>Generate Audit Report</span>
                     </button>
@@ -118,7 +162,6 @@
                     <li><strong>Deception & Misinformation</strong> - Truthful representation of capabilities and sources</li>
                     <li><strong>Manipulation</strong> - Free from coercive or exploitative tactics</li>
                     <li><strong>Privacy Violation</strong> - Appropriate data collection and consent</li>
-                    <li><strong>High-Risk Harm</strong> - Prevention of financial, physical, psychological, and social harm</li>
                 </ul>
             </div>
         </div>
