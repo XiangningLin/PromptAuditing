@@ -13,13 +13,18 @@ app = Flask(__name__)
 # Initialize AI client with zhizengzeng base URL
 # 注意：使用 OpenAI 兼容的客户端，但支持多个 AI 提供商
 # API Key 可以使用 ZZZ_API_KEY 或 OPENAI_API_KEY（向后兼容）
-api_key = os.environ.get("ZZZ_API_KEY") or os.environ.get("OPENAI_API_KEY")
-base_url = os.environ.get("ZZZ_BASE_URL") or os.environ.get("OPENAI_BASE_URL", "https://api.zhizengzeng.com/v1/")
-
-client = OpenAI(
-    api_key=api_key,
-    base_url=base_url
-)
+def get_openai_client():
+    """Get OpenAI client with proper configuration"""
+    api_key = os.environ.get("ZZZ_API_KEY") or os.environ.get("OPENAI_API_KEY")
+    base_url = os.environ.get("ZZZ_BASE_URL") or os.environ.get("OPENAI_BASE_URL", "https://api.zhizengzeng.com/v1/")
+    
+    if not api_key:
+        raise ValueError("API key not configured. Please set ZZZ_API_KEY or OPENAI_API_KEY environment variable.")
+    
+    return OpenAI(
+        api_key=api_key,
+        base_url=base_url
+    )
 
 # Load standards - use absolute path for Vercel compatibility
 standards_path = os.path.join(os.path.dirname(__file__), 'standards.json')
@@ -181,6 +186,9 @@ def audit_prompt():
         
         # Create audit prompt
         audit_prompt_text = create_audit_prompt(system_prompt)
+        
+        # Get OpenAI client (lazy initialization for Vercel compatibility)
+        client = get_openai_client()
         
         # Call OpenAI API with selected model
         response = client.chat.completions.create(
