@@ -21,8 +21,9 @@ client = OpenAI(
     base_url=base_url
 )
 
-# Load standards
-with open('standards.json', 'r') as f:
+# Load standards - use absolute path for Vercel compatibility
+standards_path = os.path.join(os.path.dirname(__file__), 'standards.json')
+with open(standards_path, 'r') as f:
     standards_data = json.load(f)
 
 def create_audit_prompt(system_prompt):
