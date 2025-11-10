@@ -18,8 +18,18 @@ def get_openai_client():
     api_key = os.environ.get("ZZZ_API_KEY") or os.environ.get("OPENAI_API_KEY")
     base_url = os.environ.get("ZZZ_BASE_URL") or os.environ.get("OPENAI_BASE_URL", "https://api.zhizengzeng.com/v1/")
     
+    # Clean up the values (remove whitespace, newlines, etc.)
+    if api_key:
+        api_key = api_key.strip()
+    if base_url:
+        base_url = base_url.strip()
+    
     if not api_key:
         raise ValueError("API key not configured. Please set ZZZ_API_KEY or OPENAI_API_KEY environment variable.")
+    
+    # Log configuration for debugging (don't log the actual API key)
+    print(f"Initializing OpenAI client with base_url: {base_url}")
+    print(f"API key configured: {'Yes' if api_key else 'No'}")
     
     return OpenAI(
         api_key=api_key,
@@ -188,18 +198,30 @@ def audit_prompt():
         audit_prompt_text = create_audit_prompt(system_prompt)
         
         # Get OpenAI client (lazy initialization for Vercel compatibility)
-        client = get_openai_client()
+        try:
+            client = get_openai_client()
+        except ValueError as ve:
+            return jsonify({'error': str(ve)}), 500
         
         # Call OpenAI API with selected model
-        response = client.chat.completions.create(
-            model=selected_model,
-            messages=[
-                {"role": "system", "content": "You are an expert AI ethics auditor. Always respond with valid JSON."},
-                {"role": "user", "content": audit_prompt_text}
-            ],
-            temperature=0.3,
-            response_format={"type": "json_object"}
-        )
+        try:
+            response = client.chat.completions.create(
+                model=selected_model,
+                messages=[
+                    {"role": "system", "content": "You are an expert AI ethics auditor. Always respond with valid JSON."},
+                    {"role": "user", "content": audit_prompt_text}
+                ],
+                temperature=0.3,
+                response_format={"type": "json_object"}
+            )
+        except Exception as api_error:
+            # Catch API-specific errors
+            error_msg = str(api_error)
+            print(f"API call error: {error_msg}")
+            return jsonify({
+                'error': f'API call failed: {error_msg}',
+                'details': 'Please check API configuration and network connection'
+            }), 500
         
         # Validate response
         if not response or not response.choices or len(response.choices) == 0:
