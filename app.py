@@ -57,7 +57,7 @@ def find_latest_benchmark_file() -> Optional[Path]:
     base_path = Path(app.root_path)
     files: List[Path] = sorted(
         base_path.glob("benchmark_results_*.json"),
-        key=lambda p: p.stat().st_mtime,
+        key=lambda p: p.name,  # Sort by filename (contains timestamp)
         reverse=True
     )
     return files[0] if files else None
