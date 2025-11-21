@@ -137,6 +137,37 @@ body {
     padding: 0 24px;
 }
 
+.sidebar-link {
+    width: 100%;
+    display: block;
+    padding: 10px 12px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.sidebar-link:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+.sidebar-link:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.sidebar-link:active {
+    transform: translateY(1px);
+}
+
 .sidebar-section h3 {
     font-size: 11px;
     font-weight: 600;
@@ -192,6 +223,19 @@ body {
     max-width: 1200px;
 }
 
+.audit-container.leaderboard-page > * {
+    width: min(70vw, 1400px);
+}
+
+.leaderboard-card {
+    width: 100%;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid var(--border-light);
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    padding: 28px 32px;
+}
+
 /* Intro Section */
 .intro-section {
     margin-bottom: 56px;
@@ -224,20 +268,140 @@ body {
     margin-bottom: 48px;
 }
 
-.input-label {
+.prompt-workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 28px;
+    align-items: start;
+}
+
+.prompt-editor {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid var(--border-light);
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    padding: 28px 30px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.prompt-editor-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.prompt-editor-header h3 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+
+.prompt-editor-header p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.ghost-button {
+    border: 1px solid var(--border-color);
+    background: rgba(248, 250, 252, 0.7);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.ghost-button:hover {
+    color: var(--text-primary);
+    border-color: var(--text-secondary);
+    background: rgba(226, 232, 240, 0.6);
+}
+
+.prompt-meta {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
-    font-weight: 500;
-    font-size: 14px;
-    color: var(--text-primary);
+    font-size: 12px;
+    color: var(--text-muted);
 }
 
-.input-hint {
-    font-size: 12px;
-    font-weight: 400;
+.prompt-meta-hint {
+    font-style: italic;
+}
+
+.prompt-side {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.model-card,
+.tip-card {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid var(--border-light);
+    border-radius: 16px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    padding: 24px;
+}
+
+.model-card-header h4,
+.tip-card h4 {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.model-card-header p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 18px;
+}
+
+.tip-card ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tip-card li {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    position: relative;
+    padding-left: 18px;
+}
+
+.tip-card li::before {
+    content: '•';
+    position: absolute;
+    left: 4px;
+    color: var(--accent-color);
+    font-size: 18px;
+    line-height: 1;
+    top: 2px;
+}
+
+.prompt-actions {
+    margin-top: 28px;
+    display: flex;
+    justify-content: flex-end;
 }
 
 /* Model Selector - Material Design */
@@ -295,7 +459,8 @@ body {
 .model-select-wrapper {
     position: relative;
     background: transparent;
-    padding: 0 20px 16px;
+    padding: 0;
+    margin-top: 12px;
 }
 
 /* Custom Select - Material Design */
@@ -551,6 +716,11 @@ body {
     background: var(--primary-hover);
     box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15), 0 2px 4px rgba(15, 23, 42, 0.08);
     transform: translateY(-1px);
+}
+
+.prompt-actions .audit-btn {
+    margin-top: 0;
+    min-width: 180px;
 }
 
 .audit-btn:active:not(:disabled) {
@@ -1087,6 +1257,146 @@ body {
     font-weight: 500;
 }
 
+/* Leaderboard Section */
+.leaderboards-section {
+    margin: 48px 0 64px;
+}
+
+.leaderboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.leaderboard-header h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text-primary);
+}
+
+.leaderboard-meta {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.leaderboard-page-controls {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+}
+
+.leaderboard-page-header {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.leaderboard-page-header h2 {
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+}
+
+.leaderboard-page-header p {
+    font-size: 15px;
+    color: var(--text-secondary);
+}
+
+.leaderboard-page-controls {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.leaderboard-card {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid var(--border-light);
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    padding: 28px 32px;
+}
+
+.leaderboard-message {
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-align: center;
+    padding: 24px 0;
+}
+
+.leaderboard-table-wrapper {
+    overflow-x: auto;
+}
+
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    min-width: 960px;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.leaderboard-table th {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.leaderboard-table tbody tr:hover {
+    background: rgba(226, 232, 255, 0.35);
+}
+
+.leaderboard-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.leaderboard-table tbody tr:nth-child(even) {
+    background: rgba(248, 250, 252, 0.85);
+}
+
+.rank-cell {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.model-cell .model-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.model-cell .model-id {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.provider-cell {
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.leaderboard-table td {
+    color: var(--text-primary);
+}
+
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
     width: 8px;
@@ -1112,6 +1422,10 @@ body {
         grid-template-columns: 1fr;
     }
     
+    .prompt-workspace {
+        grid-template-columns: 1fr;
+    }
+    
     .sidebar {
         display: none;
     }
@@ -1121,6 +1435,10 @@ body {
     }
     
     .audit-container > * {
+        width: 90%;
+    }
+
+    .audit-container.leaderboard-page > * {
         width: 90%;
     }
     
@@ -1137,6 +1455,24 @@ body {
 @media (max-width: 640px) {
     .audit-container > * {
         width: 95%;
+    }
+
+    .prompt-editor {
+        padding: 22px;
+    }
+
+    .prompt-editor-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .prompt-actions {
+        justify-content: stretch;
+    }
+
+    .prompt-actions .audit-btn {
+        width: 100%;
     }
 }
 

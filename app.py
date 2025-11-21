@@ -1,9 +1,14 @@
 import os
 import json
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+
 from flask import Flask, render_template, request, jsonify
 from openai import OpenAI
-from datetime import datetime
 from dotenv import load_dotenv
+
+from models_list import get_all_models
 
 # Load environment variables
 load_dotenv()
@@ -40,6 +45,135 @@ def get_openai_client():
 standards_path = os.path.join(os.path.dirname(__file__), 'standards.json')
 with open(standards_path, 'r') as f:
     standards_data = json.load(f)
+
+# Pre-compute model lookup for provider metadata
+MODEL_LOOKUP: Dict[str, Dict] = {}
+for model in get_all_models():
+    MODEL_LOOKUP[model["id"]] = model
+
+
+def find_latest_benchmark_file() -> Optional[Path]:
+    """Locate the newest benchmark_results_*.json file in the project root."""
+    base_path = Path(app.root_path)
+    files: List[Path] = sorted(
+        base_path.glob("benchmark_results_*.json"),
+        key=lambda p: p.stat().st_mtime,
+        reverse=True
+    )
+    return files[0] if files else None
+
+
+def load_leaderboard_rows(result_file: Path) -> Tuple[List[Dict], Dict[str, Optional[str]]]:
+    """Load leaderboard rows from the given benchmark results JSON file."""
+    try:
+        with result_file.open("r", encoding="utf-8") as fh:
+            payload = json.load(fh)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return [], {}
+
+    summary = payload.get("summary") or {}
+    benchmark_timestamp_raw = payload.get("timestamp")
+    benchmark_timestamp_iso: Optional[str] = None
+    benchmark_timestamp_display: Optional[str] = None
+    benchmark_date_display: Optional[str] = None
+
+    if benchmark_timestamp_raw:
+        try:
+            benchmark_dt = datetime.strptime(benchmark_timestamp_raw, "%Y%m%d_%H%M%S")
+            benchmark_timestamp_iso = benchmark_dt.isoformat()
+            benchmark_timestamp_display = benchmark_dt.strftime("%Y-%m-%d %H:%M:%S")
+            benchmark_date_display = benchmark_dt.strftime("%Y-%m-%d")
+        except ValueError:
+            benchmark_timestamp_display = benchmark_timestamp_raw
+            benchmark_date_display = benchmark_timestamp_raw
+
+    rows: List[Dict] = []
+
+    for model_id, stats in summary.items():
+        total_tests = stats.get("total_tests", 0) or 0
+        success_tests = stats.get("success_tests", 0) or 0
+        correct_assessments = stats.get("correct_assessments", 0) or 0
+        
+        # Calculate accuracy (correct assessments rate)
+        accuracy = (correct_assessments / total_tests) if total_tests else 0.0
+        
+        # Extract FP and FN counts and rates
+        false_positives = stats.get("false_positives", 0) or 0
+        false_negatives = stats.get("false_negatives", 0) or 0
+        fp_rate = stats.get("fp_rate", 0) or 0
+        fn_rate = stats.get("fn_rate", 0) or 0
+        total_good_prompts = stats.get("total_good_prompts", 0) or 0
+        total_bad_prompts = stats.get("total_bad_prompts", 0) or 0
+
+        total_standard_targets = (
+            stats.get("total_standard_targets")
+            or stats.get("standard_targets")
+            or 0
+        )
+        total_subcategory_targets = (
+            stats.get("total_subcategory_targets")
+            or stats.get("subcategory_targets")
+            or 0
+        )
+        standard_matches = stats.get("standard_matches", 0) or 0
+        subcategory_matches = stats.get("subcategory_matches", 0) or 0
+
+        standard_match_rate = (
+            standard_matches / total_standard_targets
+            if total_standard_targets else None
+        )
+        subcategory_match_rate = (
+            subcategory_matches / total_subcategory_targets
+            if total_subcategory_targets else None
+        )
+
+        provider = MODEL_LOOKUP.get(model_id, {}).get("provider")
+        name = stats.get("name") or MODEL_LOOKUP.get(model_id, {}).get("name") or model_id
+
+        rows.append({
+            "model_id": model_id,
+            "model_name": name,
+            "provider": provider,
+            "accuracy": accuracy,
+            "false_positives": false_positives,
+            "false_negatives": false_negatives,
+            "fp_rate": fp_rate,
+            "fn_rate": fn_rate,
+            "total_good_prompts": total_good_prompts,
+            "total_bad_prompts": total_bad_prompts,
+            "total_tests": total_tests,
+            "standard_match_rate": standard_match_rate,
+            "subcategory_match_rate": subcategory_match_rate,
+            "standard_matches": standard_matches,
+            "total_standard_targets": total_standard_targets,
+            "subcategory_matches": subcategory_matches,
+            "total_subcategory_targets": total_subcategory_targets,
+            "correct_assessments": correct_assessments,
+            "run_timestamp_raw": benchmark_timestamp_raw,
+            "run_timestamp_iso": benchmark_timestamp_iso,
+            "run_timestamp_display": benchmark_timestamp_display,
+            "run_date": benchmark_date_display
+        })
+
+    # Multi-level sorting: Accuracy > Std Match > Sub Match > FP Rate (lower is better)
+    rows.sort(
+        key=lambda r: (
+            round(r["accuracy"], 6),  # 1. Accuracy (higher is better)
+            round(r["standard_match_rate"], 6) if r["standard_match_rate"] is not None else -1.0,  # 2. Std Match
+            round(r["subcategory_match_rate"], 6) if r["subcategory_match_rate"] is not None else -1.0,  # 3. Sub Match
+            -round(r["fp_rate"], 6),  # 4. FP Rate (lower is better, so negate)
+            r["total_tests"]
+        ),
+        reverse=True
+    )
+
+    return rows, {
+        "benchmark_timestamp": benchmark_timestamp_raw,
+        "benchmark_timestamp_iso": benchmark_timestamp_iso,
+        "benchmark_timestamp_display": benchmark_timestamp_display,
+        "benchmark_date_display": benchmark_date_display
+    }
+
 
 def create_audit_prompt(system_prompt):
     """Create a comprehensive audit prompt for OpenAI"""
@@ -138,6 +272,11 @@ Be thorough and strict. When in doubt, flag it as a violation."""
 def index():
     return render_template('index.html')
 
+
+@app.route('/leaderboard')
+def leaderboard_page():
+    return render_template('leaderboard.html')
+
 @app.route('/api/standards')
 def get_standards():
     """Return the standards data"""
@@ -182,6 +321,62 @@ def get_models():
         ]
     }
     return jsonify({"models": models})
+
+
+@app.route('/api/leaderboard')
+def get_leaderboard():
+    """Return latest benchmark leaderboard data for UI display."""
+    top = request.args.get("top", type=int)
+    latest_file = find_latest_benchmark_file()
+
+    if not latest_file:
+        return jsonify({
+            "rows": [],
+            "metadata": {
+                "message": "No benchmark results found. Run benchmark.py first."
+            }
+        }), 404
+
+    rows, extra_meta = load_leaderboard_rows(latest_file)
+    if not rows:
+        return jsonify({
+            "rows": [],
+            "metadata": {
+                "message": "Benchmark results file is empty or invalid.",
+                "source": latest_file.name
+            }
+        }), 400
+
+    if top is not None and top > 0:
+        rows = rows[:top]
+
+    for idx, row in enumerate(rows, start=1):
+        row["rank"] = idx
+        row["accuracy_pct"] = round(row["accuracy"] * 100, 1)
+        if row["standard_match_rate"] is not None:
+            row["standard_match_pct"] = round(row["standard_match_rate"] * 100, 1)
+        else:
+            row["standard_match_pct"] = None
+        if row["subcategory_match_rate"] is not None:
+            row["subcategory_match_pct"] = round(row["subcategory_match_rate"] * 100, 1)
+        else:
+            row["subcategory_match_pct"] = None
+
+    metadata = {
+        "source": latest_file.name,
+        "last_updated": datetime.fromtimestamp(latest_file.stat().st_mtime).isoformat(),
+        "total_models": len(rows),
+        "benchmark_timestamp": extra_meta.get("benchmark_timestamp"),
+        "benchmark_timestamp_iso": extra_meta.get("benchmark_timestamp_iso"),
+        "benchmark_timestamp_display": extra_meta.get("benchmark_timestamp_display"),
+        "benchmark_date_display": extra_meta.get("benchmark_date_display")
+    }
+
+    return jsonify({
+        "rows": rows,
+        "metadata": metadata
+    })
+
 
 @app.route('/api/audit', methods=['POST'])
 def audit_prompt():

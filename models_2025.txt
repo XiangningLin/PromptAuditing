@@ -1,0 +1,73 @@
+================================================================================
+智增增 API - 2025年发布的模型
+ZhiZengZeng API - Models Released in 2025
+================================================================================
+
+
+【OpenAI】 - 21 models
+--------------------------------------------------------------------------------
+  • computer-use-preview-2025-03-11
+  • gpt-4.1-2025-04-14
+  • gpt-4.1-mini-2025-04-14
+  • gpt-4.1-nano-2025-04-14
+  • gpt-4.5-preview-2025-02-27
+  • gpt-4o-audio-preview-2025-06-03
+  • gpt-4o-mini-search-preview-2025-03-11
+  • gpt-5-2025-08-07
+  • gpt-5-mini-2025-08-07
+  • gpt-5-nano-2025-08-07
+  • gpt-5-pro-2025-10-06
+  • gpt-5.1-2025-11-13
+  • gpt-audio-2025-08-28
+  • gpt-realtime-2025-08-28
+  • o1-pro-2025-03-19
+  • o3-2025-04-16
+  • o3-deep-research-2025-06-26
+  • o3-mini-2025-01-31
+  • o3-pro-2025-06-10
+  • o4-mini-2025-04-16
+  • o4-mini-deep-research-2025-06-26
+
+【Anthropic (Claude)】 - 12 models
+--------------------------------------------------------------------------------
+  • claude-3-7-sonnet-20250219
+  • claude-3-7-sonnet-20250219-thinking
+  • claude-haiku-4-5-20251001
+  • claude-haiku-4-5-20251001-thinking
+  • claude-opus-4-1-20250805
+  • claude-opus-4-1-20250805-thinking
+  • claude-opus-4-20250514
+  • claude-opus-4-20250514-thinking
+  • claude-sonnet-4-20250514
+  • claude-sonnet-4-20250514-thinking
+  • claude-sonnet-4-5-20250929
+  • claude-sonnet-4-5-20250929-thinking
+
+【Alibaba (Qwen)】 - 13 models
+--------------------------------------------------------------------------------
+  • qwen-flash-2025-07-28
+  • qwen-long-2025-01-25
+  • qwen-max-2025-01-25
+  • qwen-omni-turbo-2025-01-19
+  • qwen-omni-turbo-2025-03-26
+  • qwen-plus-2025-04-28
+  • qwen-plus-2025-07-14
+  • qwen-plus-2025-07-28
+  • qwen-turbo-2025-04-28
+  • qwen-turbo-2025-07-15
+  • qwen3-coder-plus-2025-07-22
+  • qwen3-max-2025-09-23
+  • qwq-plus-2025-03-05
+
+【Tencent (Hunyuan)】 - 6 models
+--------------------------------------------------------------------------------
+  • hunyuan-t1-20250321
+  • hunyuan-t1-20250403
+  • hunyuan-turbos-20250313
+  • hunyuan-turbos-20250416
+  • hunyuan-turbos-20250515
+  • hunyuan-turbos-longtext-128k-20250325
+
+================================================================================
+总计 / Total: 52 models from 2025
+================================================================================

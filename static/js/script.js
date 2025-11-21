@@ -8,6 +8,8 @@ const auditBtn = document.getElementById('auditBtn');
 const clearBtn = document.getElementById('clearBtn');
 const resultsContainer = document.getElementById('resultsContainer');
 const auditReport = document.getElementById('auditReport');
+const promptCharCount = document.getElementById('promptCharCount');
+const promptClearBtn = document.getElementById('promptClearBtn');
 const viewStandardsBtn = document.getElementById('viewStandardsBtn');
 const aboutBtn = document.getElementById('aboutBtn');
 const standardsModal = document.getElementById('standardsModal');
@@ -34,6 +36,18 @@ function setupEventListeners() {
     
     // Clear button
     clearBtn.addEventListener('click', handleClear);
+
+    if (promptClearBtn) {
+        promptClearBtn.addEventListener('click', () => {
+            promptInput.value = '';
+            updatePromptMetrics();
+            promptInput.focus();
+        });
+    }
+    if (promptInput) {
+        promptInput.addEventListener('input', updatePromptMetrics);
+        updatePromptMetrics();
+    }
     
     // Modals
     viewStandardsBtn.addEventListener('click', showStandardsModal);
@@ -55,6 +69,7 @@ function setupEventListeners() {
     
     // Custom select dropdown
     setupCustomSelect();
+
 }
 
 function setupCustomSelect() {
@@ -179,11 +194,19 @@ function selectOption(model, optionElement) {
     }
 }
 
+function updatePromptMetrics() {
+    if (!promptCharCount || !promptInput) return;
+    const length = promptInput.value.length;
+    const label = length === 1 ? 'character' : 'characters';
+    promptCharCount.textContent = `${length} ${label}`;
+}
+
 function handleClear() {
     promptInput.value = '';
     resultsContainer.style.display = 'none';
     auditReport.innerHTML = '';
     promptInput.focus();
+    updatePromptMetrics();
 }
 
 async function loadStandards() {

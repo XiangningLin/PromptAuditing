@@ -1,89 +1,72 @@
 """
 智增增支持的模型完整列表
 Zhizengzeng Supported Models Complete List
+Updated based on 2025.11.20 Official Log - Consolidated
 """
 
 ZHIZENGZENG_MODELS = {
     # OpenAI Models
     "openai": [
+        # GPT-5.1 Series (Nov 2025)
+        {"id": "gpt-5.1", "name": "GPT-5.1", "provider": "OpenAI", "type": "chat"},
+        {"id": "gpt-5.1-chat-latest", "name": "GPT-5.1 Chat Latest", "provider": "OpenAI", "type": "chat"},
+        
+        # # GPT-5 Pro Series (Oct 2025)
+        # {"id": "gpt-5-pro", "name": "GPT-5 Pro", "provider": "OpenAI", "type": "chat"},
+        # {"id": "gpt-5-pro-2025-10-06", "name": "GPT-5 Pro (Oct 06)", "provider": "OpenAI", "type": "chat"},
+        
+        # # GPT-5 Base Series (Aug 2025)
+        # {"id": "gpt-5", "name": "GPT-5", "provider": "OpenAI", "type": "chat"},
+        # {"id": "gpt-5-mini", "name": "GPT-5 Mini", "provider": "OpenAI", "type": "chat"},
+        # {"id": "gpt-5-nano", "name": "GPT-5 Nano", "provider": "OpenAI", "type": "chat"},
+        
+        # # GPT-4.1 Series (Apr 2025)
+        # {"id": "gpt-4.1", "name": "GPT-4.1", "provider": "OpenAI", "type": "chat"},
+        # {"id": "gpt-4.1-mini", "name": "GPT-4.1 Mini", "provider": "OpenAI", "type": "chat"},
+        # {"id": "gpt-4.1-nano", "name": "GPT-4.1 Nano", "provider": "OpenAI", "type": "chat"},
+        
+        # # GPT-4.5 Series (Feb 2025)
+        # {"id": "gpt-4.5-preview", "name": "GPT-4.5 Preview", "provider": "OpenAI", "type": "chat"},
+        # {"id": "gpt-4.5-preview-2025-02-27", "name": "GPT-4.5 Preview (Feb 27)", "provider": "OpenAI", "type": "chat"},
+
+        # # Baseline
         {"id": "gpt-4o", "name": "GPT-4o", "provider": "OpenAI", "type": "chat"},
-        {"id": "gpt-4o-mini", "name": "GPT-4o Mini", "provider": "OpenAI", "type": "chat"},
-        {"id": "gpt-4-turbo", "name": "GPT-4 Turbo", "provider": "OpenAI", "type": "chat"},
-        {"id": "gpt-4", "name": "GPT-4", "provider": "OpenAI", "type": "chat"},
-        {"id": "gpt-3.5-turbo", "name": "GPT-3.5 Turbo", "provider": "OpenAI", "type": "chat"},
-        {"id": "gpt-3.5-turbo-16k", "name": "GPT-3.5 Turbo 16K", "provider": "OpenAI", "type": "chat"},
     ],
-    
-    # Anthropic Models
+
+    # Anthropic (Claude) Models
     "anthropic": [
-        {"id": "claude-3-5-sonnet-20241022", "name": "Claude 3.5 Sonnet", "provider": "Anthropic", "type": "chat"},
-        {"id": "claude-3-opus-20240229", "name": "Claude 3 Opus", "provider": "Anthropic", "type": "chat"},
-        {"id": "claude-3-sonnet-20240229", "name": "Claude 3 Sonnet", "provider": "Anthropic", "type": "chat"},
-        {"id": "claude-3-haiku-20240307", "name": "Claude 3 Haiku", "provider": "Anthropic", "type": "chat"},
+        # 2025 Models (Verified from API)
+        {"id": "claude-3-7-sonnet-20250219", "name": "Claude 3.7 Sonnet", "provider": "Anthropic", "type": "chat"},
+        {"id": "claude-haiku-4-5-20251001", "name": "Claude Haiku 4.5", "provider": "Anthropic", "type": "chat"},
+        {"id": "claude-sonnet-4-5-20250929", "name": "Claude Sonnet 4.5", "provider": "Anthropic", "type": "chat"},
+        {"id": "claude-opus-4-1-20250805", "name": "Claude Opus 4.1", "provider": "Anthropic", "type": "chat"},
+        
+        # Baseline (2024)
+        {"id": "claude-3-5-sonnet-20241022", "name": "Claude 3.5 Sonnet (Baseline)", "provider": "Anthropic", "type": "chat"},
     ],
-    
+
+    # Google (Gemini) Models
+    "google": [
+        # Gemini 3 Series (Nov 2025)
+        {"id": "gemini-3-pro-preview", "name": "Gemini 3 Pro Preview", "provider": "Google", "type": "chat"},
+        
+        # Gemini 2.5 Series (Jun/Aug 2025)
+        {"id": "gemini-2.5-pro", "name": "Gemini 2.5 Pro", "provider": "Google", "type": "chat"},
+        {"id": "gemini-2.5-flash-lite", "name": "Gemini 2.5 Flash Lite", "provider": "Google", "type": "chat"},
+        
+    ],
+
     # DeepSeek Models
     "deepseek": [
-        {"id": "deepseek-chat", "name": "DeepSeek Chat", "provider": "DeepSeek", "type": "chat"},
-        {"id": "deepseek-coder", "name": "DeepSeek Coder", "provider": "DeepSeek", "type": "chat"},
+        # DeepSeek V3/R1 Series (Jan/May/Aug 2025)
+        {"id": "deepseek-chat", "name": "DeepSeek V3.1 (Chat)", "provider": "DeepSeek", "type": "chat"},
+        {"id": "deepseek-reasoner", "name": "DeepSeek R1-0528 (Reasoner)", "provider": "DeepSeek", "type": "chat"},
     ],
-    
-    # Google Models
-    "google": [
-        {"id": "gemini-pro", "name": "Gemini Pro", "provider": "Google", "type": "chat"},
-        {"id": "gemini-1.5-pro", "name": "Gemini 1.5 Pro", "provider": "Google", "type": "chat"},
-        {"id": "gemini-1.5-flash", "name": "Gemini 1.5 Flash", "provider": "Google", "type": "chat"},
-    ],
-    
-    # 阿里 Alibaba Models
-    "alibaba": [
-        {"id": "qwen-turbo", "name": "通义千问 Turbo", "provider": "Alibaba", "type": "chat"},
-        {"id": "qwen-plus", "name": "通义千问 Plus", "provider": "Alibaba", "type": "chat"},
-        {"id": "qwen-max", "name": "通义千问 Max", "provider": "Alibaba", "type": "chat"},
-        {"id": "qwen-max-longcontext", "name": "通义千问 Max Long", "provider": "Alibaba", "type": "chat"},
-    ],
-    
-    # 百度 Baidu Models
-    "baidu": [
-        {"id": "ernie-bot", "name": "文心一言", "provider": "Baidu", "type": "chat"},
-        {"id": "ernie-bot-turbo", "name": "文心一言 Turbo", "provider": "Baidu", "type": "chat"},
-        {"id": "ernie-bot-4", "name": "文心一言 4.0", "provider": "Baidu", "type": "chat"},
-    ],
-    
-    # 智谱 Zhipu Models
-    "zhipu": [
-        {"id": "glm-4", "name": "ChatGLM-4", "provider": "Zhipu", "type": "chat"},
-        {"id": "glm-4-plus", "name": "ChatGLM-4 Plus", "provider": "Zhipu", "type": "chat"},
-        {"id": "glm-3-turbo", "name": "ChatGLM-3 Turbo", "provider": "Zhipu", "type": "chat"},
-    ],
-    
-    # 字节 ByteDance Models
-    "bytedance": [
-        {"id": "doubao-pro-32k", "name": "豆包 Pro 32K", "provider": "ByteDance", "type": "chat"},
-        {"id": "doubao-lite-32k", "name": "豆包 Lite 32K", "provider": "ByteDance", "type": "chat"},
-    ],
-    
-    # 百川 Baichuan Models
-    "baichuan": [
-        {"id": "baichuan2-turbo", "name": "百川2 Turbo", "provider": "Baichuan", "type": "chat"},
-        {"id": "baichuan2-turbo-192k", "name": "百川2 Turbo 192K", "provider": "Baichuan", "type": "chat"},
-    ],
-    
-    # 讯飞 iFlytek Models
-    "iflytek": [
-        {"id": "spark-3.5", "name": "讯飞星火 3.5", "provider": "iFlytek", "type": "chat"},
-        {"id": "spark-3.0", "name": "讯飞星火 3.0", "provider": "iFlytek", "type": "chat"},
-    ],
-    
+
     # xAI Models
     "xai": [
-        {"id": "grok-beta", "name": "Grok Beta", "provider": "xAI", "type": "chat"},
-    ],
-    
-    # Meta Models
-    "meta": [
-        {"id": "llama-3-70b", "name": "Llama 3 70B", "provider": "Meta", "type": "chat"},
-        {"id": "llama-3-8b", "name": "Llama 3 8B", "provider": "Meta", "type": "chat"},
+        # Grok 4 Series (Jul 2025)
+        {"id": "grok-4-0709", "name": "Grok 4 (0709)", "provider": "xAI", "type": "chat"},
     ],
 }
 
@@ -99,33 +82,26 @@ def get_models_by_provider(provider):
     return ZHIZENGZENG_MODELS.get(provider, [])
 
 def get_benchmark_models():
-    """获取推荐用于 benchmark 的模型（代表性模型）"""
-    return [
-        # OpenAI 顶级模型
-        {"id": "gpt-4o", "name": "GPT-4o", "provider": "OpenAI", "tier": "premium"},
-        {"id": "gpt-4o-mini", "name": "GPT-4o Mini", "provider": "OpenAI", "tier": "mid"},
-        {"id": "gpt-3.5-turbo", "name": "GPT-3.5 Turbo", "provider": "OpenAI", "tier": "budget"},
-        
-        # Anthropic 顶级模型
-        {"id": "claude-3-5-sonnet-20241022", "name": "Claude 3.5 Sonnet", "provider": "Anthropic", "tier": "premium"},
-        {"id": "claude-3-haiku-20240307", "name": "Claude 3 Haiku", "provider": "Anthropic", "tier": "budget"},
-        
-        # 中国主流模型
-        {"id": "deepseek-chat", "name": "DeepSeek Chat", "provider": "DeepSeek", "tier": "mid"},
-        {"id": "qwen-max", "name": "通义千问 Max", "provider": "Alibaba", "tier": "premium"},
-        {"id": "qwen-turbo", "name": "通义千问 Turbo", "provider": "Alibaba", "tier": "budget"},
-        {"id": "glm-4", "name": "ChatGLM-4", "provider": "Zhipu", "tier": "mid"},
-        {"id": "ernie-bot-4", "name": "文心一言 4.0", "provider": "Baidu", "tier": "premium"},
-        
-        # Google
-        {"id": "gemini-1.5-pro", "name": "Gemini 1.5 Pro", "provider": "Google", "tier": "premium"},
-        {"id": "gemini-1.5-flash", "name": "Gemini 1.5 Flash", "provider": "Google", "tier": "budget"},
-    ]
+    """获取推荐用于 benchmark 的所有 2025 Chat 模型"""
+    benchmark_list = []
+    
+    # 遍历所有提供商，收集所有 chat 类型的模型
+    for provider, models in ZHIZENGZENG_MODELS.items():
+        for model in models:
+            if model.get("type") == "chat":
+                benchmark_list.append({
+                    "id": model["id"], 
+                    "name": model["name"], 
+                    "provider": model["provider"], 
+                    "tier": "2025-All"
+                })
+    
+    return benchmark_list
 
 def print_all_models():
     """打印所有模型"""
     print("\n" + "="*80)
-    print("智增增支持的所有模型 / All Zhizengzeng Supported Models")
+    print("智增增支持的所有模型 (2025 Consolidated + User Custom)")
     print("="*80 + "\n")
     
     total = 0
@@ -142,9 +118,3 @@ def print_all_models():
 
 if __name__ == "__main__":
     print_all_models()
-    
-    print("\n推荐 Benchmark 模型 / Recommended Benchmark Models:")
-    print("-" * 80)
-    for model in get_benchmark_models():
-        print(f"  [{model['tier']:8}] {model['id']:40} | {model['name']}")
-

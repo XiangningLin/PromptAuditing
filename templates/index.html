@@ -37,6 +37,11 @@
                 </div>
                 
                 <div class="sidebar-section">
+                    <h3>Insights</h3>
+                    <a class="sidebar-link" href="{{ url_for('leaderboard_page') }}">Benchmark Leaderboard</a>
+                </div>
+                
+                <div class="sidebar-section">
                     <h3>Quick Guide</h3>
                     <p class="help-text">
                         1. Paste your system prompt in the text area<br>
@@ -56,37 +61,36 @@
 
                 <!-- Input Area -->
                 <div class="prompt-input-section">
-                    <label for="promptInput" class="input-label">
-                        <span>System Prompt</span>
-                        <span class="input-hint">Paste your AI system prompt below</span>
-                    </label>
-                    <textarea 
-                        id="promptInput" 
-                        placeholder="Enter your system prompt here for auditing...&#10;&#10;Example: You are a helpful AI assistant that provides accurate information..."
-                        rows="8"
-                    ></textarea>
-                    
-                    <div class="model-selector-wrapper">
-                        <div class="model-selector-header">
-                            <div class="model-label-group">
-                                <svg class="model-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
+                    <div class="prompt-workspace">
+                        <section class="prompt-editor">
+                            <div class="prompt-editor-header">
                                 <div>
-                                    <label for="modelSelect" class="model-label-text">AI Model</label>
-                                    <span class="model-hint-text">Select the model to perform the audit</span>
+                                    <h3>System Prompt</h3>
+                                    <p>Paste the system instructions you want to audit. Markdown formatting is supported.</p>
                                 </div>
+                                <button type="button" class="ghost-button" id="promptClearBtn">Clear</button>
                             </div>
+                            <textarea 
+                                id="promptInput" 
+                                placeholder="Enter your system prompt here for auditing...&#10;&#10;Example: You are a helpful AI assistant that provides accurate information..."
+                                rows="10"
+                            ></textarea>
+                            <div class="prompt-meta">
+                                <span id="promptCharCount">0 characters</span>
+                                <span class="prompt-meta-hint">Shift + Enter for newline</span>
+                            </div>
+                        </section>
+
+                        <aside class="prompt-side">
+                            <section class="model-card">
+                                <div class="model-card-header">
+                                    <h4>Evaluation Model</h4>
+                                    <p>Select which model should perform the audit.</p>
                         </div>
                         <div class="model-select-wrapper">
-                            <!-- Hidden native select for form compatibility -->
                             <select id="modelSelect" style="display: none;">
                                 <option value="gpt-4o">GPT-4o (Recommended)</option>
                             </select>
-                            
-                            <!-- Custom dropdown -->
                             <div class="custom-select" id="customSelect">
                                 <div class="custom-select-trigger" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
                                     <span class="custom-select-value">GPT-4o (Recommended)</span>
@@ -107,11 +111,24 @@
                                 <span class="model-info-description"></span>
                             </div>
                         </div>
+                            </section>
+
+                            <section class="tip-card">
+                                <h4>Quick Tips</h4>
+                                <ul>
+                                    <li>Include the full system prompt, not just user instructions.</li>
+                                    <li>Mention the industry or product if the prompt depends on context.</li>
+                                    <li>Remove secrets or identifiers before submitting.</li>
+                                </ul>
+                            </section>
+                        </aside>
                     </div>
                     
+                    <div class="prompt-actions">
                     <button class="audit-btn" id="auditBtn">
-                        <span>Generate Audit Report</span>
+                            <span>Run Audit</span>
                     </button>
+                    </div>
                 </div>
 
                 <!-- Results Area -->
@@ -124,6 +141,7 @@
                         <!-- Report will appear here -->
                     </div>
                 </div>
+
             </main>
         </div>
     </div>
